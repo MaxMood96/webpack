@@ -265,7 +265,11 @@ module.exports = [
 			"n/no-unsupported-features/node-builtins": [
 				"error",
 				{
-					ignores: ["zlib.createBrotliCompress", "zlib.createBrotliDecompress"]
+					ignores: [
+						"zlib.createBrotliCompress",
+						"zlib.createBrotliDecompress",
+						"EventSource"
+					]
 				}
 			],
 			"n/exports-style": "error"
@@ -397,6 +401,7 @@ module.exports = [
 			"n/no-unsupported-features/node-builtins": [
 				"error",
 				{
+					ignores: ["Blob"],
 					allowExperimental: true
 				}
 			],
