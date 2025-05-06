@@ -307,6 +307,11 @@ const describeCases = config => {
 									});
 								}
 
+								/**
+								 * @private
+								 * @param {string} module module
+								 * @returns {EXPECTED_ANY} required module
+								 */
 								function _require(module) {
 									if (module.startsWith("./")) {
 										const p = path.join(outputDirectory, module);
@@ -319,6 +324,7 @@ const describeCases = config => {
 										const fn = vm.runInThisContext(
 											"(function(require, module, exports, __dirname, __filename, it, beforeEach, afterEach, expect, jest, self, window, fetch, document, importScripts, Worker, EventSource, NEXT, STATS) {" +
 												"global.expect = expect;" +
+												"global.it = it;" +
 												`function nsObj(m) { Object.defineProperty(m, Symbol.toStringTag, { value: "Module" }); return m; }${fs.readFileSync(
 													p,
 													"utf-8"

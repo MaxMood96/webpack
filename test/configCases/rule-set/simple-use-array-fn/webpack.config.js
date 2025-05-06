@@ -14,7 +14,7 @@ module.exports = {
 					{
 						test: [require.resolve("./a"), require.resolve("./c")],
 						issuer: require.resolve("./b"),
-						use: data => [
+						use: () => [
 							"./loader",
 							{
 								loader: "./loader",
@@ -23,7 +23,7 @@ module.exports = {
 							{
 								loader: "./loader",
 								options: {
-									get: function () {
+									get() {
 										return "second-3";
 									}
 								}

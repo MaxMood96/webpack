@@ -4,11 +4,10 @@ on:
   push:
     branches:
       - main
-      - dev-1
   pull_request:
     branches:
       - main
-      - dev-1
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -47,7 +46,7 @@ jobs:
         run: |
           yarn upgrade typescript@5.0
           yarn --frozen-lockfile
-          yarn type-validate
+          yarn validate:types
   validate-legacy-node:
     runs-on: ubuntu-latest
     steps:
@@ -60,6 +59,36 @@ jobs:
       # Remove `devDependencies` from `package.json` to avoid `yarn install` compatibility error
       - run: node -e "const content = require('./package.json');delete content.devDependencies;require('fs').writeFileSync('package.json', JSON.stringify(content, null, 2));"
       - run: yarn install --production --frozen-lockfile
+  benchmark:
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1/4, 2/4, 3/4, 4/4]
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-tags: true
+          fetch-depth: 0
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: "yarn"
+      - run: yarn --frozen-lockfile
+      - run: yarn link --frozen-lockfile || true
+      - run: yarn link webpack --frozen-lockfile
+      - name: Run benchmarks
+        uses: CodSpeedHQ/action@v3
+        with:
+          run: yarn benchmark --ci --only-head
+          token: ${{ secrets.CODSPEED_TOKEN }}
+        env:
+          CODSPEED: 1
+          SHARD: ${{ matrix.shard }}
   basic:
     runs-on: ubuntu-latest
     steps:
